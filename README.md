@@ -14,7 +14,9 @@ No invented employers. No screenshot-only demos. Code first.
 agentic-portfolio/
   packages/                 # one package per portfolio project
     async-orchestrator/     # #1 — shipped
+    strict-tool-router/     # #3 — shipped (this track)
   docs/architecture/        # reserved for #15 system teardowns
+  ROADMAP.md                # session build order for agents / Chase
   .github/workflows/        # CI
   pyproject.toml            # uv workspace root
 ```
@@ -25,28 +27,32 @@ Python-first, managed with [uv](https://docs.astral.sh/uv/). Requires Python 3.1
 git clone https://github.com/chander4/agentic-portfolio.git
 cd agentic-portfolio
 uv sync --all-packages
-uv run pytest packages/async-orchestrator/tests -q
+uv run pytest packages/async-orchestrator/tests packages/strict-tool-router/tests -q
 ```
+
+**Session roadmap:** see [ROADMAP.md](ROADMAP.md) for hireability build order
+(`#1` done → `#3` → `#5` Self-Healing ReAct → `#2` Context Budget Assembler → rest)
+and notes for future agents working on glitch at `c:\Users\chase\git\agentic-portfolio`.
 
 ## Roadmap (15 projects)
 
 | # | Project | Status | What it demonstrates |
 |---|---|---|---|
 | **1** | **[Async Agent Orchestrator](packages/async-orchestrator/)** | **Done** | FastAPI + asyncio, 100+ concurrent agents, non-blocking tools, Bedrock-ready LLM layer, graceful tool failure isolation |
-| 2 | Tool Gateway & Policy Engine | Planned | AuthZ, allowlists, rate limits, and audit trails in front of agent tools |
-| 3 | Bedrock Agent Runtime Adapter | Planned | Production Converse/Agents wiring, retries, idempotency, cost attribution |
-| 4 | Multi-Agent Supervisor | Planned | Planner/worker topology with handoffs and shared scratchpads |
-| 5 | Durable Agent Workflows | Planned | Checkpointing, resume-after-crash, exactly-once tool side effects |
-| 6 | Retrieval & Memory Fabric | Planned | Hybrid retrieval, session memory, and grounding for long-running agents |
-| 7 | Eval Harness for Agents | Planned | Trajectory scoring, regression suites, CI gates on agent quality |
-| 8 | Observability for Agents | Planned | Traces, token/cost metrics, tool latency SLOs, incident-ready dashboards |
-| 9 | Human-in-the-Loop Desk | Planned | Approval queues, escalation policies, and safe resume |
-| 10 | Secure Tool Sandbox | Planned | Network egress controls, secret redaction, blast-radius limits |
-| 11 | Event-Driven Agent Bus | Planned | Queue/stream triggered agents with backpressure and DLQs |
-| 12 | Cost & Capacity Governor | Planned | Budget caps, model routing, and graceful degradation under spend pressure |
-| 13 | Agent Integration Test Kit | Planned | Contract tests for tools/LLMs with deterministic fixtures |
-| 14 | Ops Copilot (IaC + Runtime) | Planned | Agents that reason over infra signals without unsupervised mutations |
-| 15 | Architecture Teardowns | Planned | Written postmortems of real agent system designs (`docs/architecture/`) |
+| 2 | Context Budget Assembler | Later | Pack prompts under token budgets with priority and truncation |
+| **3** | **[Strict Pydantic Tool Router](packages/strict-tool-router/)** | **Done** | Schema-first tool args via Pydantic, automatic retry with validation error traces, mock/Bedrock providers |
+| 4 | Multi-Agent Supervisor | Later | Planner/worker topology with handoffs and shared scratchpads |
+| 5 | Self-Healing ReAct | **Next** | Detect failed tool/LLM steps; bounded repair loop |
+| 6 | Retrieval & Memory Fabric | Later | Hybrid retrieval, session memory, and grounding for long-running agents |
+| 7 | Eval Harness for Agents | Later | Trajectory scoring, regression suites, CI gates on agent quality |
+| 8 | Observability for Agents | Later | Traces, token/cost metrics, tool latency SLOs, incident-ready dashboards |
+| 9 | Human-in-the-Loop Desk | Later | Approval queues, escalation policies, and safe resume |
+| 10 | Secure Tool Sandbox | Later | Network egress controls, secret redaction, blast-radius limits |
+| 11 | Event-Driven Agent Bus | Later | Queue/stream triggered agents with backpressure and DLQs |
+| 12 | Cost & Capacity Governor | Later | Budget caps, model routing, and graceful degradation under spend pressure |
+| 13 | Agent Integration Test Kit | Later | Contract tests for tools/LLMs with deterministic fixtures |
+| 14 | Ops Copilot (IaC + Runtime) | Later | Agents that reason over infra signals without unsupervised mutations |
+| 15 | Architecture Teardowns | Later | Written postmortems of real agent system designs (`docs/architecture/`) |
 
 ## Project #1 highlight
 
@@ -61,6 +67,21 @@ The [Async Agent Orchestrator](packages/async-orchestrator/) is the foundation e
 ```bash
 uv run uvicorn async_orchestrator.main:app --app-dir packages/async-orchestrator/src --port 8080
 curl -X POST "http://127.0.0.1:8080/demo/concurrency?count=100&sleep_seconds=0.05"
+```
+
+## Project #3 highlight
+
+The [Strict Pydantic Tool Router](packages/strict-tool-router/) turns stochastic tool JSON into deterministic actions:
+
+- Every tool declares a Pydantic args model (JSON Schema derived, not hand-rolled)
+- Invalid proposals never reach handlers — validation is a hard gate
+- Automatic retry appends the `VALIDATION_ERROR` trace so the model can correct itself
+- Mock default proves bad→good retry without AWS credentials
+
+```bash
+uv run python -m strict_tool_router.demo
+uv run uvicorn strict_tool_router.main:app --app-dir packages/strict-tool-router/src --port 8081
+curl -X POST http://127.0.0.1:8081/demo/retry -H "content-type: application/json" -d "{\"scenario\":\"bad_then_good\"}"
 ```
 
 ## Contact
