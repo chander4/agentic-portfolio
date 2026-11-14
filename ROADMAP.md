@@ -21,12 +21,12 @@ monorepo. No fake completion dates — status only.
 | Order | # | Project | Status | Notes |
 |---|---|---|---|---|
 | 1 | **1** | [Async Agent Orchestrator](packages/async-orchestrator/) | **Done** | Concurrent agents, non-blocking tools, mock/Bedrock |
-| 2 | **3** | [Strict Pydantic Tool Router](packages/strict-tool-router/) | **Done** | Schema gate + retry-with-trace (this PR) |
-| 3 | **5** | Self-Healing ReAct | **Next** | Detect failed tool/LLM steps; repair loop with bounded retries |
-| 4 | **2** | Context Budget Assembler | **Later** | Pack prompts under token budgets with priority/truncation |
-| 5+ | 4, 6–15 | Remaining projects | **Later** | See backlog below |
+| 2 | **3** | [Strict Pydantic Tool Router](packages/strict-tool-router/) | **Done** | Schema gate + retry-with-trace |
+| 3 | **5** | [Self-Healing ReAct](packages/self-healing-react/) | **Done** | Stack/compiler heal loop with bounded retries |
+| 4 | **2** | [Context Budget Assembler](packages/context-budget-assembler/) | **Done** | Priority pack + truncate/summarize under hard budget |
+| 5+ | 4, 6–15 | Remaining projects | **Later** | See backlog below — **#4 Multi-Agent Supervisor** is next |
 
-After #3 merges, the next session should start **#5 Self-Healing ReAct** unless
+After #2 merges, the next session should start **#4 Multi-Agent Supervisor** unless
 Chase redirects.
 
 ## Full backlog (one-liners)
@@ -34,10 +34,10 @@ Chase redirects.
 | # | Project | Status | One-liner |
 |---|---|---|---|
 | 1 | Async Agent Orchestrator | Done | Event-loop concurrency for 100+ tool-using agents |
-| 2 | Context Budget Assembler | Later | Assemble RAG/history/tool context under a hard token budget |
+| 2 | Context Budget Assembler | Done | Assemble RAG/history/tool context under a hard token budget |
 | 3 | Strict Pydantic Tool Router | Done | Force tool args through Pydantic; retry on validation errors |
-| 4 | Multi-Agent Supervisor | Later | Planner/worker topology with handoffs and shared scratchpads |
-| 5 | Self-Healing ReAct | Next | ReAct loop that diagnoses and repairs failed steps |
+| 4 | Multi-Agent Supervisor | Next | Planner/worker topology with handoffs and shared scratchpads |
+| 5 | Self-Healing ReAct | Done | ReAct loop that diagnoses and repairs failed steps |
 | 6 | Retrieval & Memory Fabric | Later | Hybrid retrieval + session memory for long-running agents |
 | 7 | Eval Harness for Agents | Later | Trajectory scoring and CI gates on agent quality |
 | 8 | Observability for Agents | Later | Traces, token/cost metrics, tool latency SLOs |
