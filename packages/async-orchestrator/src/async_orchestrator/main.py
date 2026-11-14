@@ -125,7 +125,7 @@ def create_app(orchestrator: AgentOrchestrator | None = None) -> FastAPI:
             "succeeded": succeeded,
             "failed": failed,
             "proof": (
-                "Wall time stayed near sleep_seconds, not count×sleep — "
+                "Wall time stayed near sleep_seconds, not count*sleep - "
                 "the event loop interleaved awaits instead of blocking."
             ),
         }
