@@ -22,6 +22,8 @@ dev = [
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["packages"]
+# Unique basenames across packages (e.g. test_api.py) need importlib mode.
+addopts = "--import-mode=importlib"
 
 [tool.ruff]
 line-length = 100
