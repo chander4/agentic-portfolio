@@ -15,7 +15,8 @@ agentic-portfolio/
   packages/                 # one package per portfolio project
     async-orchestrator/     # #1 — shipped
     strict-tool-router/     # #3 — shipped
-    self-healing-react/     # #5 — shipped (this track)
+    self-healing-react/     # #5 — shipped
+    context-budget-assembler/  # #2 — shipped (this track)
   docs/architecture/        # reserved for #15 system teardowns
   ROADMAP.md                # session build order for agents / Chase
   .github/workflows/        # CI
@@ -28,11 +29,11 @@ Python-first, managed with [uv](https://docs.astral.sh/uv/). Requires Python 3.1
 git clone https://github.com/chander4/agentic-portfolio.git
 cd agentic-portfolio
 uv sync --all-packages
-uv run pytest packages/async-orchestrator/tests packages/strict-tool-router/tests packages/self-healing-react/tests -q
+uv run pytest packages/async-orchestrator/tests packages/strict-tool-router/tests packages/self-healing-react/tests packages/context-budget-assembler/tests -q
 ```
 
 **Session roadmap:** see [ROADMAP.md](ROADMAP.md) for hireability build order
-(`#1` done → `#3` done → `#5` done → `#2` Context Budget Assembler → rest)
+(`#1` → `#3` → `#5` → `#2` done → remaining 4, 6–15)
 and notes for future agents working on glitch at `c:\Users\chase\git\agentic-portfolio`.
 
 ## Roadmap (15 projects)
@@ -40,9 +41,9 @@ and notes for future agents working on glitch at `c:\Users\chase\git\agentic-por
 | # | Project | Status | What it demonstrates |
 |---|---|---|---|
 | **1** | **[Async Agent Orchestrator](packages/async-orchestrator/)** | **Done** | FastAPI + asyncio, 100+ concurrent agents, non-blocking tools, Bedrock-ready LLM layer, graceful tool failure isolation |
-| 2 | Context Budget Assembler | **Next** | Pack prompts under token budgets with priority and truncation |
+| **2** | **[Context Budget Assembler](packages/context-budget-assembler/)** | **Done** | Pack prompts under token budgets with priority, truncation, optional summarize |
 | **3** | **[Strict Pydantic Tool Router](packages/strict-tool-router/)** | **Done** | Schema-first tool args via Pydantic, automatic retry with validation error traces, mock/Bedrock providers |
-| 4 | Multi-Agent Supervisor | Later | Planner/worker topology with handoffs and shared scratchpads |
+| 4 | Multi-Agent Supervisor | **Next** | Planner/worker topology with handoffs and shared scratchpads |
 | **5** | **[Self-Healing ReAct](packages/self-healing-react/)** | **Done** | Parse stack/compiler errors; rewrite failing tool calls; bounded heal retries |
 | 6 | Retrieval & Memory Fabric | Later | Hybrid retrieval, session memory, and grounding for long-running agents |
 | 7 | Eval Harness for Agents | Later | Trajectory scoring, regression suites, CI gates on agent quality |
@@ -98,6 +99,22 @@ The [Self-Healing ReAct](packages/self-healing-react/) agent treats tool explosi
 uv run python -m self_healing_react.demo
 uv run uvicorn self_healing_react.main:app --app-dir packages/self-healing-react/src --port 8082
 curl -X POST http://127.0.0.1:8082/demo/heal -H "content-type: application/json" -d "{\"scenario\":\"fail_then_heal\"}"
+```
+
+## Project #2 highlight
+
+The [Context Budget Assembler](packages/context-budget-assembler/) treats prompt
+context as a scarce resource:
+
+- Segments carry kind, priority, and sticky flags
+- Packer guarantees `used_tokens <= budget_tokens`
+- Overflow drops low-priority first; sticky content truncates (or summarizes via mock/Bedrock)
+- Deterministic token estimator — no tiktoken required for CI/demos
+
+```bash
+uv run python -m context_budget_assembler.demo
+uv run uvicorn context_budget_assembler.main:app --app-dir packages/context-budget-assembler/src --port 8083
+curl -X POST http://127.0.0.1:8083/demo/pack -H "content-type: application/json" -d "{\"scenario\":\"overflow_drop_low_priority\",\"budget_tokens\":80}"
 ```
 
 ## Contact
